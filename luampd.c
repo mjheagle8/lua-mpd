@@ -47,10 +47,27 @@ errorout:
         return 1;
 }
 
+/* toggle mpd status */
+int mpd_toggle(lua_State *L)
+{
+        /* get mpd connection from arguments */
+        struct mpd_connection *conn = NULL;
+        if (lua_islightuserdata(L, 1) == 1)
+                 conn = (struct mpd_connection *)lua_topointer(L, 1);
+        else
+                return 0;
+
+        /* run command */
+        mpd_run_toggle_pause(conn);
+
+        return 0;
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
         {"connect",     mpd_connect},
+        {"toggle",      mpd_toggle},
         {NULL,          NULL}
 };
 
