@@ -63,11 +63,27 @@ int mpd_toggle(lua_State *L)
         return 0;
 }
 
+/* free mpd connection */
+int mpd_free_connection(lua_State *L)
+{
+        /* get mpd connection from arguments */
+        struct mpd_connection *conn = NULL;
+        if (lua_islightuserdata(L, 1) == 1)
+                 conn = (struct mpd_connection *)lua_topointer(L, 1);
+        else
+                return 0;
+
+        mpd_connection_free(conn);
+
+        return 0;
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
-        {"connect",     mpd_connect},
-        {"toggle",      mpd_toggle},
+        {"connect",             mpd_connect},
+        {"toggle",              mpd_toggle},
+        {"free_connection",     mpd_free_connection},
         {NULL,          NULL}
 };
 
