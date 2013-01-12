@@ -11,6 +11,42 @@
 #include <mpd/client.h>
 
 /*
+ * table helper function to push an integer
+ * internal function
+ * arguments are the lua_State, key name, and value
+ */
+void lua_table_push_int(lua_State *L, const char *key, const int value)
+{
+        lua_pushstring(L, key);
+        lua_pushinteger(L, value);
+        lua_settable(L, -3);
+}
+
+/*
+ * table helper function to push a float
+ * internal function
+ * arguments are the lua_State, key name, and value
+ */
+void lua_table_push_float(lua_State *L, const char *key, const float value)
+{
+        lua_pushstring(L, key);
+        lua_pushnumber(L, value);
+        lua_settable(L, -3);
+}
+
+/*
+ * table helper function to push a string
+ * internal function
+ * arguments are the lua_State, key name, and value
+ */
+void lua_table_push_str(lua_State *L, const char *key, const char *value)
+{
+        lua_pushstring(L, key);
+        lua_pushstring(L, value);
+        lua_settable(L, -3);
+}
+
+/*
  * create a connection to mpd
  * lua function
  * arguments are the mpd host (string), port (int), and timeout (int (ms))
@@ -156,6 +192,69 @@ int mpd_free_connection(lua_State *L)
         return 0;
 }
 
+/*
+ * get mpd state
+ * lua function
+ * argument is the connection
+ * return is a table with status values
+ */
+int mpd_state(lua_State *L)
+{
+        /* get mpd connection from arguments */
+        struct mpd_connection *conn = NULL;
+        if (lua_islightuserdata(L, 1) == 1)
+                 conn = (struct mpd_connection *)lua_topointer(L, 1);
+        else
+                return 0;
+
+        /* get status from mpd */
+        struct mpd_status *status = NULL;
+        status = mpd_run_status(conn);
+
+        /* create table for results */
+        lua_newtable(L);
+
+        /* get state */
+        enum mpd_state state = mpd_status_get_state(status);
+        if (state == MPD_STATE_STOP)
+                lua_table_push_str(L, "state", "stopped");
+        else if (state == MPD_STATE_PLAY)
+                lua_table_push_str(L, "state", "playing");
+        else if (state == MPD_STATE_PAUSE)
+                lua_table_push_str(L, "state", "paused");
+        else
+        {
+                lua_table_push_str(L, "state", "unknown");
+                return 1;
+        }
+
+        /* simple values */
+        lua_table_push_int(L, "volume",         mpd_status_get_volume(status));
+        lua_table_push_int(L, "random",         mpd_status_get_random(status));
+        lua_table_push_int(L, "repeat",         mpd_status_get_repeat(status));
+        lua_table_push_int(L, "single",         mpd_status_get_single(status));
+        lua_table_push_int(L, "consume",        mpd_status_get_consume(status));
+        lua_table_push_int(L, "queue_length",   mpd_status_get_queue_length(status));
+        lua_table_push_int(L, "queue_version",  mpd_status_get_queue_version(status));
+        lua_table_push_int(L, "crossfade",      mpd_status_get_crossfade(status));
+        lua_table_push_float(L, "mixrampdb",    mpd_status_get_mixrampdb(status));
+        lua_table_push_float(L, "mixrampdelay", mpd_status_get_mixrampdelay(status));
+        lua_table_push_int(L, "song_pos",       mpd_status_get_song_pos(status));
+        lua_table_push_int(L, "song_id",        mpd_status_get_song_id(status));
+        lua_table_push_int(L, "next_song_pos",  mpd_status_get_next_song_pos(status));
+        lua_table_push_int(L, "next_song_id",   mpd_status_get_next_song_id(status));
+        lua_table_push_int(L, "elapsed_time",   mpd_status_get_elapsed_time(status));
+        lua_table_push_int(L, "elapsed_ms",     mpd_status_get_elapsed_ms(status));
+        lua_table_push_int(L, "total_time",     mpd_status_get_total_time(status));
+        lua_table_push_int(L, "kbit_rate",      mpd_status_get_kbit_rate(status));
+        lua_table_push_int(L, "update_id",      mpd_status_get_update_id(status));
+
+        /* free status struct */
+        mpd_status_free(status);
+
+        return 1;
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
@@ -165,6 +264,7 @@ static const struct luaL_Reg mpd[] =
         {"next",                mpd_next},
         {"prev",                mpd_prev},
         {"toggle",              mpd_toggle},
+        {"state",               mpd_state},
         {"free_connection",     mpd_free_connection},
         {NULL,          NULL}
 };

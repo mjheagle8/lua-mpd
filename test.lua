@@ -14,8 +14,12 @@ print('attempting mpd connection...')
 conn = mpd.connect('localhost', 6600, 1000)
 print(conn)
 
-print('toggle:')
-print(mpd.toggle(conn))
+print('state:')
+state = mpd.state(conn)
+print(state)
+for k, v in pairs(state) do
+    print(string.format('  %s: %s', tostring(k), tostring(v)))
+end
 
 mpd.free_connection(conn)
 print('done')
