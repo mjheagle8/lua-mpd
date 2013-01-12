@@ -82,6 +82,28 @@ int mpd_cmd(lua_State *L, bool (*func)())
 }
 
 /*
+ * stop mpd
+ * lua function
+ * argument is the connection
+ * will return error message, if one exists
+ */
+int mpd_stop(lua_State *L)
+{
+        return mpd_cmd(L, &mpd_run_stop);
+}
+
+/*
+ * begin playing
+ * lua function
+ * argument is the connection
+ * will return error message, if one exists
+ */
+int mpd_play(lua_State *L)
+{
+        return mpd_cmd(L, &mpd_run_play);
+}
+
+/*
  * toggle mpd status
  * lua function
  * argument is the connection
@@ -138,6 +160,8 @@ int mpd_free_connection(lua_State *L)
 static const struct luaL_Reg mpd[] =
 {
         {"connect",             mpd_connect},
+        {"play",                mpd_play},
+        {"stop",                mpd_stop},
         {"next",                mpd_next},
         {"prev",                mpd_prev},
         {"toggle",              mpd_toggle},
