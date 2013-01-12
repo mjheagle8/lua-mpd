@@ -320,7 +320,7 @@ static const struct luaL_Reg mpd[] =
         {"state",               mpd_state},
         {"now_playing",         mpd_now_playing},
         {"free_connection",     mpd_free_connection},
-        {NULL,          NULL}
+        {NULL,                  NULL}
 };
 
 /* register functions on load */
