@@ -93,6 +93,28 @@ int mpd_toggle(lua_State *L)
 }
 
 /*
+ * move to next track
+ * lua function
+ * argument is the connection
+ * will return error message, if one exists
+ */
+int mpd_next(lua_State *L)
+{
+        return mpd_cmd(L, &mpd_run_next);
+}
+
+/*
+ * move to previous track
+ * lua function
+ * argument is the connection
+ * will return error message, if one exists
+ */
+int mpd_prev(lua_State *L)
+{
+        return mpd_cmd(L, &mpd_run_previous);
+}
+
+/*
  * free mpd connection
  * lua function
  * argument is the connection
@@ -116,6 +138,8 @@ int mpd_free_connection(lua_State *L)
 static const struct luaL_Reg mpd[] =
 {
         {"connect",             mpd_connect},
+        {"next",                mpd_next},
+        {"prev",                mpd_prev},
         {"toggle",              mpd_toggle},
         {"free_connection",     mpd_free_connection},
         {NULL,          NULL}
