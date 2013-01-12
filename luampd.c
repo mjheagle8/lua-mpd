@@ -47,8 +47,8 @@ errorout:
         return 1;
 }
 
-/* toggle mpd status */
-int mpd_toggle(lua_State *L)
+/* run a mpd command */
+int mpd_cmd(lua_State *L, bool (*func)())
 {
         /* get mpd connection from arguments */
         struct mpd_connection *conn = NULL;
@@ -58,9 +58,22 @@ int mpd_toggle(lua_State *L)
                 return 0;
 
         /* run command */
-        mpd_run_toggle_pause(conn);
+        bool ret = (int)func(conn);
 
-        return 0;
+        /* determine whether to print error message in lua */
+        if (ret)
+                return 0;
+        else
+        {
+                lua_pushstring(L, "error running mpd command");
+                return 1;
+        }
+}
+
+/* toggle mpd status */
+int mpd_toggle(lua_State *L)
+{
+        return mpd_cmd(L, &mpd_run_toggle_pause);
 }
 
 /* free mpd connection */
