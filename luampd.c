@@ -292,7 +292,7 @@ int mpd_now_playing(lua_State *L)
         /* get mpd connection from arguments */
         struct mpd_connection *conn = NULL;
         if (lua_islightuserdata(L, 1) == 1)
-                 conn = (struct mpd_connection *)lua_topointer(L, 1);
+                conn = (struct mpd_connection *)lua_topointer(L, 1);
         else
                 return 0;
 
