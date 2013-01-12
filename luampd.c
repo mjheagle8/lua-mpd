@@ -10,7 +10,12 @@
 #include <string.h>
 #include <mpd/client.h>
 
-/* create a connection to mpd */
+/*
+ * create a connection to mpd
+ * lua function
+ * arguments are the mpd host (string), port (int), and timeout (int (ms))
+ * return is a pointer to the mpd connection
+ */
 int mpd_connect(lua_State *L)
 {
         /* get arguments to function */
@@ -47,7 +52,13 @@ errorout:
         return 1;
 }
 
-/* run a mpd command */
+/*
+ * run a mpd command
+ * internal function
+ * arguments are lua_state and the function to execute
+ * will push error message onto stack if necessary
+ * and return the integer to be returned to lua
+ */
 int mpd_cmd(lua_State *L, bool (*func)())
 {
         /* get mpd connection from arguments */
@@ -70,13 +81,23 @@ int mpd_cmd(lua_State *L, bool (*func)())
         }
 }
 
-/* toggle mpd status */
+/*
+ * toggle mpd status
+ * lua function
+ * argument is the connection
+ * will return error message, if one exists
+ */
 int mpd_toggle(lua_State *L)
 {
         return mpd_cmd(L, &mpd_run_toggle_pause);
 }
 
-/* free mpd connection */
+/*
+ * free mpd connection
+ * lua function
+ * argument is the connection
+ * no returns
+ */
 int mpd_free_connection(lua_State *L)
 {
         /* get mpd connection from arguments */
