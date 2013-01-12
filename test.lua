@@ -28,5 +28,12 @@ for k, v in pairs(np) do
     print(string.format('  %s: %s', tostring(k), tostring(v)))
 end
 
+print('playlist:')
+pl = mpd.playlist(conn)
+print(pl)
+for k, v in pairs(pl) do
+    print(string.format('  %s: %s - %s', tostring(k), tostring(v.artist), tostring(v.title)))
+end
+
 mpd.free_connection(conn)
 print('done')

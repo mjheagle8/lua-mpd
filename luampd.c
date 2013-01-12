@@ -308,6 +308,43 @@ int mpd_now_playing(lua_State *L)
         return 1;
 }
 
+/*
+ * get current playlist
+ * lua function
+ * argument is connection
+ * return is a table of mpd tags
+ */
+int mpd_cur_playlist(lua_State *L)
+{
+        /* get mpd connection from arguments */
+        struct mpd_connection *conn = NULL;
+        if (lua_islightuserdata(L, 1) == 1)
+                conn = (struct mpd_connection *)lua_topointer(L, 1);
+        else
+                return 0;
+
+        /* create table for playlist */
+        lua_newtable(L);
+
+        /* initiate playlist transmission */
+        mpd_send_list_queue_meta(conn);
+
+        /* loop through songs */
+        int counter = 0;
+        struct mpd_song *song = NULL;
+        while ((song = mpd_recv_song(conn)) != NULL)
+        {
+                counter++;
+                lua_pushinteger(L, counter);
+                mpd_parse_song(L, song);
+                lua_settable(L, -3);
+                mpd_song_free(song);
+        }
+        printf("%d songs recieved\n", counter);
+
+        return 1;
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
@@ -319,6 +356,7 @@ static const struct luaL_Reg mpd[] =
         {"toggle",              mpd_toggle},
         {"state",               mpd_state},
         {"now_playing",         mpd_now_playing},
+        {"playlist",            mpd_cur_playlist},
         {"free_connection",     mpd_free_connection},
         {NULL,                  NULL}
 };
