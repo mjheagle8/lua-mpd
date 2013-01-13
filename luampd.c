@@ -58,15 +58,12 @@ int mpd_connect(lua_State *L)
         if (!lua_isstring(L, 1))
                 goto errorout;
         const char *host = lua_tostring(L, 1);
-        printf("host: %s\n", host);
         if (!lua_isnumber(L, 2))
                 goto errorout;
         const int port = lua_tonumber(L, 2);
-        printf("port: %d\n", port);
         if (!lua_isnumber(L, 3))
                 goto errorout;
         const int timeout = lua_tonumber(L, 3);
-        printf("timeout: %d\n", timeout);
 
         /* establish connection */
         struct mpd_conection *conn = mpd_connection_new(host, port, timeout);
@@ -340,7 +337,46 @@ int mpd_cur_playlist(lua_State *L)
                 lua_settable(L, -3);
                 mpd_song_free(song);
         }
-        printf("%d songs recieved\n", counter);
+
+        return 1;
+}
+
+/*
+ * get mpd statistics
+ * argument is connection
+ * return is a table of statistics
+ */
+int mpd_stats(lua_State *L)
+{
+        /* get mpd connection from arguments */
+        struct mpd_connection *conn = NULL;
+        if (lua_islightuserdata(L, 1) == 1)
+                conn = (struct mpd_connection *)lua_topointer(L, 1);
+        else
+                return 0;
+
+        /* create a table for stats */
+        lua_newtable(L);
+
+        /* get stats from mpd */
+        struct mpd_stats *stats = mpd_run_stats(conn);
+
+        /* simple values */
+        lua_table_push_int(L, "artists",        mpd_stats_get_number_of_artists(stats));
+        lua_table_push_int(L, "albums",         mpd_stats_get_number_of_albums(stats));
+        lua_table_push_int(L, "songs",          mpd_stats_get_number_of_songs(stats));
+        lua_table_push_int(L, "uptime",         mpd_stats_get_uptime(stats));
+        lua_table_push_int(L, "play_time",      mpd_stats_get_play_time(stats));
+        lua_table_push_int(L, "db_play_time",   mpd_stats_get_db_play_time(stats));
+
+        /* db update time */
+        long update_time = mpd_stats_get_db_update_time(stats);
+        char *update_time_str = ctime(&update_time);
+        *(strchr(update_time_str, '\n')) = 0;
+        lua_table_push_str(L, "db_update_time", update_time_str);
+
+        /* free stats */
+        mpd_stats_free(stats);
 
         return 1;
 }
@@ -357,6 +393,7 @@ static const struct luaL_Reg mpd[] =
         {"state",               mpd_state},
         {"now_playing",         mpd_now_playing},
         {"playlist",            mpd_cur_playlist},
+        {"stats",               mpd_stats},
         {"free_connection",     mpd_free_connection},
         {NULL,                  NULL}
 };

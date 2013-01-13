@@ -28,6 +28,13 @@ for k, v in pairs(np) do
     print(string.format('  %s: %s', tostring(k), tostring(v)))
 end
 
+print('stats:')
+stats = mpd.stats(conn)
+print(stats)
+for k, v in pairs(stats) do
+    print(string.format('  %s: %s', tostring(k), tostring(v)))
+end
+
 print('playlist:')
 pl = mpd.playlist(conn)
 print(pl)
