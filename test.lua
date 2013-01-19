@@ -45,5 +45,14 @@ if type(pl) == type({}) then
     end
 end
 
+local v0 = state.volume
+print(string.format('volume: %d%%', v0))
+mpd.set_volume(conn, 95)
+state = mpd.state(conn)
+print(string.format('volume: %d%%', state.volume))
+mpd.set_volume(conn, v0)
+state = mpd.state(conn)
+print(string.format('volume: %d%%', state.volume))
+
 mpd.free_connection(conn)
 print('done')

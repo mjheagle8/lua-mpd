@@ -352,6 +352,7 @@ int mpd_cur_playlist(lua_State *L)
 
 /*
  * get mpd statistics
+ * lua function
  * argument is connection
  * return is a table of statistics
  */
@@ -390,6 +391,35 @@ int mpd_stats(lua_State *L)
         return 1;
 }
 
+/*
+ * set mpd volume
+ * lua function
+ * arguments are connection, volume to set (0-100)
+ * no returns
+ */
+int mpd_volume(lua_State *L)
+{
+        /* get mpd connection from arguments */
+        struct mpd_connection *conn = NULL;
+        if (lua_islightuserdata(L, 1) == 1)
+                conn = (struct mpd_connection *)lua_topointer(L, 1);
+        else
+                return 0;
+
+        /* get volume from arguments */
+        int vol = -1;
+        if (lua_isnumber(L, 2) == 1)
+                vol = lua_tonumber(L, 2);
+        else
+                return 0;
+        if (vol < 0 || vol > 100)
+                return 0;
+
+        /* set volume */
+        mpd_run_set_volume(conn, vol);
+        return 0;
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
@@ -403,6 +433,7 @@ static const struct luaL_Reg mpd[] =
         {"now_playing",         mpd_now_playing},
         {"playlist",            mpd_cur_playlist},
         {"stats",               mpd_stats},
+        {"set_volume",          mpd_volume},
         {"free_connection",     mpd_free_connection},
         {NULL,                  NULL}
 };
