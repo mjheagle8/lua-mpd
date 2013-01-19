@@ -75,6 +75,34 @@ DB Play Time: %s
     end
 end
 
+-- test volume function
+-- requires mpd.state
+-- change volume, check it worked, reset volume, check again
+function test_volume(conn, verbose)
+    print('volume:')
+    pass = true
+    local testvol = 95
+
+    local v0 = state.volume
+    if verbose == true then print(string.format('  volume: %d%%', v0)) end
+
+    mpd.set_volume(conn, testvol)
+    state = mpd.state(conn)
+    if verbose == true then print(string.format('  volume: %d%%', state.volume)) end
+    if state.volume ~= testvol then pass = false end
+
+    mpd.set_volume(conn, v0)
+    state = mpd.state(conn)
+    if verbose == true then print(string.format('  volume: %d%%', state.volume)) end
+    if state.volume ~= v0 then pass = false end
+
+    if pass then
+        print('  passed')
+    else
+        print('  failed')
+    end
+end
+
 print('state:')
 state = mpd.state(conn)
 print(state)
@@ -94,18 +122,10 @@ if type(pl) == type({}) then
     end
 end
 
-local v0 = state.volume
-print(string.format('volume: %d%%', v0))
-mpd.set_volume(conn, 95)
-state = mpd.state(conn)
-print(string.format('volume: %d%%', state.volume))
-mpd.set_volume(conn, v0)
-state = mpd.state(conn)
-print(string.format('volume: %d%%', state.volume))
-
 -- run test functions
 local verbose = false
 test_stats(conn, verbose)
+test_volume(conn, verbose)
 
 mpd.free_connection(conn)
 print('done')
