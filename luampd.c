@@ -11,6 +11,17 @@
 #include <mpd/client.h>
 
 /*
+ * macros
+ */
+/* get mpd connection from arguments */
+#define get_mpd_conn(L) \
+        struct mpd_connection *conn = NULL; \
+        if (lua_islightuserdata(L, 1) == 1) \
+                conn = (struct mpd_connection *)lua_topointer(L, 1); \
+        else \
+                return 0;
+
+/*
  * table helper function to push an integer
  * internal function
  * arguments are the lua_State, key name, and value
@@ -94,12 +105,7 @@ errorout:
  */
 int mpd_cmd(lua_State *L, bool (*func)())
 {
-        /* get mpd connection from arguments */
-        struct mpd_connection *conn = NULL;
-        if (lua_islightuserdata(L, 1) == 1)
-                 conn = (struct mpd_connection *)lua_topointer(L, 1);
-        else
-                return 0;
+        get_mpd_conn(L);
 
         /* run command */
         bool ret = (int)func(conn);
@@ -177,12 +183,7 @@ int mpd_prev(lua_State *L)
  */
 int mpd_free_connection(lua_State *L)
 {
-        /* get mpd connection from arguments */
-        struct mpd_connection *conn = NULL;
-        if (lua_islightuserdata(L, 1) == 1)
-                 conn = (struct mpd_connection *)lua_topointer(L, 1);
-        else
-                return 0;
+        get_mpd_conn(L);
 
         mpd_connection_free(conn);
 
@@ -197,12 +198,7 @@ int mpd_free_connection(lua_State *L)
  */
 int mpd_state(lua_State *L)
 {
-        /* get mpd connection from arguments */
-        struct mpd_connection *conn = NULL;
-        if (lua_islightuserdata(L, 1) == 1)
-                 conn = (struct mpd_connection *)lua_topointer(L, 1);
-        else
-                return 0;
+        get_mpd_conn(L);
 
         /* get status from mpd */
         struct mpd_status *status = NULL;
@@ -286,12 +282,7 @@ void mpd_parse_song(lua_State *L, struct mpd_song *song)
  */
 int mpd_now_playing(lua_State *L)
 {
-        /* get mpd connection from arguments */
-        struct mpd_connection *conn = NULL;
-        if (lua_islightuserdata(L, 1) == 1)
-                conn = (struct mpd_connection *)lua_topointer(L, 1);
-        else
-                return 0;
+        get_mpd_conn(L);
 
         /* check that the state is playing or paused */
         struct mpd_status *status = NULL;
@@ -322,12 +313,7 @@ int mpd_now_playing(lua_State *L)
  */
 int mpd_cur_playlist(lua_State *L)
 {
-        /* get mpd connection from arguments */
-        struct mpd_connection *conn = NULL;
-        if (lua_islightuserdata(L, 1) == 1)
-                conn = (struct mpd_connection *)lua_topointer(L, 1);
-        else
-                return 0;
+        get_mpd_conn(L);
 
         /* create table for playlist */
         lua_newtable(L);
@@ -358,12 +344,7 @@ int mpd_cur_playlist(lua_State *L)
  */
 int mpd_stats(lua_State *L)
 {
-        /* get mpd connection from arguments */
-        struct mpd_connection *conn = NULL;
-        if (lua_islightuserdata(L, 1) == 1)
-                conn = (struct mpd_connection *)lua_topointer(L, 1);
-        else
-                return 0;
+        get_mpd_conn(L);
 
         /* create a table for stats */
         lua_newtable(L);
@@ -399,12 +380,7 @@ int mpd_stats(lua_State *L)
  */
 int mpd_volume(lua_State *L)
 {
-        /* get mpd connection from arguments */
-        struct mpd_connection *conn = NULL;
-        if (lua_islightuserdata(L, 1) == 1)
-                conn = (struct mpd_connection *)lua_topointer(L, 1);
-        else
-                return 0;
+        get_mpd_conn(L);
 
         /* get volume from arguments */
         int vol = -1;
