@@ -424,17 +424,17 @@ int mpd_volume(lua_State *L)
 static const struct luaL_Reg mpd[] =
 {
         {"connect",             mpd_connect},
-        {"play",                mpd_play},
-        {"stop",                mpd_stop},
-        {"next",                mpd_next},
-        {"prev",                mpd_prev},
-        {"toggle",              mpd_toggle},
-        {"state",               mpd_state},
-        {"now_playing",         mpd_now_playing},
-        {"playlist",            mpd_cur_playlist},
-        {"stats",               mpd_stats},
-        {"set_volume",          mpd_volume},
         {"free_connection",     mpd_free_connection},
+        {"next",                mpd_next},
+        {"now_playing",         mpd_now_playing},
+        {"play",                mpd_play},
+        {"playlist",            mpd_cur_playlist},
+        {"prev",                mpd_prev},
+        {"set_volume",          mpd_volume},
+        {"state",               mpd_state},
+        {"stats",               mpd_stats},
+        {"stop",                mpd_stop},
+        {"toggle",              mpd_toggle},
         {NULL,                  NULL}
 };
 
