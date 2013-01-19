@@ -38,5 +38,5 @@ lua bindings to libmpdclient, by mjheagle
     - toggle repeat
     - toggle single
     - modify volume
-- stats
+* stats
 - update database
