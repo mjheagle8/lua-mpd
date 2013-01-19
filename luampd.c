@@ -293,6 +293,15 @@ int mpd_now_playing(lua_State *L)
         else
                 return 0;
 
+        /* check that the state is playing or paused */
+        struct mpd_status *status = NULL;
+        status = mpd_run_status(conn);
+        enum mpd_state state = mpd_status_get_state(status);
+        bool cont = (state == MPD_STATE_PLAY) || (state == MPD_STATE_PAUSE);
+        mpd_status_free(status);
+        if (!cont)
+                return 0;
+
         /* get current song from mpd */
         struct mpd_song *song = mpd_run_current_song(conn);
 
