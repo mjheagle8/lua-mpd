@@ -34,7 +34,7 @@ local function reltime(t)
     t = t - min*60
     local sec = t
 
-    return string.format('%d days, %d:%2d:%2d', days, hours, min, sec)
+    return string.format('%d days, %d:%02d:%02d', days, hours, min, sec)
 end
 
 -- connect to mpd
