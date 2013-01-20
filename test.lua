@@ -47,14 +47,18 @@ if type(conn) ~= 'userdata' then
 end
 
 -- test statistics function
--- compare data gathered against mpc output
+-- compare data gathered against 'mpc stats' output
 function test_stats(conn, verbose)
     print('stats:')
     local stats = mpd.stats(conn)
+
+    -- gather command output
     local cmd = io.popen('mpc stats')
     local mpclines = cmd:read('*a')
     cmd:close()
     if verbose == true then print(mpclines) end
+
+    -- generate (hopefully) matching output
     local liblines = string.format(
 [[Artists: %6d
 Albums: %7d
