@@ -20,42 +20,16 @@
                 conn = (struct mpd_connection *)lua_topointer(L, 1); \
         else \
                 return 0;
-
-/*
- * table helper function to push an integer
- * internal function
- * arguments are the lua_State, key name, and value
- */
-void lua_table_push_int(lua_State *L, const char *key, const int value)
-{
-        lua_pushstring(L, key);
-        lua_pushinteger(L, value);
-        lua_settable(L, -3);
-}
-
-/*
- * table helper function to push a float
- * internal function
- * arguments are the lua_State, key name, and value
- */
-void lua_table_push_float(lua_State *L, const char *key, const float value)
-{
-        lua_pushstring(L, key);
-        lua_pushnumber(L, value);
-        lua_settable(L, -3);
-}
-
-/*
- * table helper function to push a string
- * internal function
- * arguments are the lua_State, key name, and value
- */
-void lua_table_push_str(lua_State *L, const char *key, const char *value)
-{
-        lua_pushstring(L, key);
-        lua_pushstring(L, value);
-        lua_settable(L, -3);
-}
+/* push a value into a table */
+#define lua_table_push(L, key, value, pushfunc) \
+        { \
+                lua_pushstring(L, key); \
+                pushfunc(L, value); \
+                lua_settable(L, -3); \
+        }
+#define lua_table_push_int(L, key, value)    lua_table_push(L, key, value, lua_pushinteger)
+#define lua_table_push_str(L, key, value)    lua_table_push(L, key, value, lua_pushstring)
+#define lua_table_push_float(L, key, value)  lua_table_push(L, key, value, lua_pushnumber)
 
 /*
  * create a connection to mpd
@@ -210,14 +184,14 @@ int mpd_state(lua_State *L)
         /* get state */
         enum mpd_state state = mpd_status_get_state(status);
         if (state == MPD_STATE_STOP)
-                lua_table_push_str(L, "state", "stopped");
+                lua_table_push(L, "state", "stopped", lua_pushstring)
         else if (state == MPD_STATE_PLAY)
-                lua_table_push_str(L, "state", "playing");
+                lua_table_push(L, "state", "playing", lua_pushstring)
         else if (state == MPD_STATE_PAUSE)
-                lua_table_push_str(L, "state", "paused");
+                lua_table_push(L, "state", "paused", lua_pushstring)
         else
         {
-                lua_table_push_str(L, "state", "unknown");
+                lua_table_push(L, "state", "unknown", lua_pushstring)
                 return 1;
         }
 
