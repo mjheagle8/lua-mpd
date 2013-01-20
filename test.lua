@@ -133,7 +133,7 @@ function test_state(conn, verbose)
         mpclines:match('volume:(%d+)%%%s+repeat: (%w+)%s+random: (%w+)%s+single: (%w+)%s+consume: (%w+)')
 
     -- helper function to map on/off to 1/0
-    local str2bool = function (a) if a == 'on' then return 1 else return 0 end end
+    local str2bool = function (a) if a == 'on' then return true else return false end end
 
     -- helper function to map mm:ss to integer
     local time2int = function (a)
@@ -149,10 +149,10 @@ function test_state(conn, verbose)
         print(string.format('  %s (%d)', songpos, time2int(songpos)))
         print(string.format('  %s (%d)', songsize, time2int(songsize)))
         print(string.format('  %s', vol))
-        print(string.format('  %s (%d)', rpt, str2bool(rpt)))
-        print(string.format('  %s (%d)', random, str2bool(random)))
-        print(string.format('  %s (%d)', single, str2bool(single)))
-        print(string.format('  %s (%d)', consume, str2bool(consume)))
+        print(string.format('  %s (%s)', rpt, str2bool(rpt)))
+        print(string.format('  %s (%s)', random, str2bool(random)))
+        print(string.format('  %s (%s)', single, str2bool(single)))
+        print(string.format('  %s (%s)', consume, str2bool(consume)))
     end
 
     -- check parsed fields

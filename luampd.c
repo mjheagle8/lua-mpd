@@ -27,9 +27,10 @@
                 pushfunc(L, value); \
                 lua_settable(L, -3); \
         }
-#define lua_table_push_int(L, key, value)    lua_table_push(L, key, value, lua_pushinteger)
-#define lua_table_push_str(L, key, value)    lua_table_push(L, key, value, lua_pushstring)
-#define lua_table_push_float(L, key, value)  lua_table_push(L, key, value, lua_pushnumber)
+#define lua_table_push_int(L, key, value)    {lua_table_push(L, key, value, lua_pushinteger)}
+#define lua_table_push_str(L, key, value)    {lua_table_push(L, key, value, lua_pushstring)}
+#define lua_table_push_float(L, key, value)  {lua_table_push(L, key, value, lua_pushnumber)}
+#define lua_table_push_bool(L, key, value)   {lua_table_push(L, key, value, lua_pushboolean)}
 
 /*
  * create a connection to mpd
@@ -184,23 +185,23 @@ int mpd_state(lua_State *L)
         /* get state */
         enum mpd_state state = mpd_status_get_state(status);
         if (state == MPD_STATE_STOP)
-                lua_table_push(L, "state", "stopped", lua_pushstring)
+                lua_table_push_str(L, "state", "stopped")
         else if (state == MPD_STATE_PLAY)
-                lua_table_push(L, "state", "playing", lua_pushstring)
+                lua_table_push_str(L, "state", "playing")
         else if (state == MPD_STATE_PAUSE)
-                lua_table_push(L, "state", "paused", lua_pushstring)
+                lua_table_push_str(L, "state", "paused")
         else
         {
-                lua_table_push(L, "state", "unknown", lua_pushstring)
+                lua_table_push_str(L, "state", "unknown")
                 return 1;
         }
 
         /* simple values */
         lua_table_push_int(L, "volume",         mpd_status_get_volume(status));
-        lua_table_push_int(L, "random",         mpd_status_get_random(status));
-        lua_table_push_int(L, "repeat",         mpd_status_get_repeat(status));
-        lua_table_push_int(L, "single",         mpd_status_get_single(status));
-        lua_table_push_int(L, "consume",        mpd_status_get_consume(status));
+        lua_table_push_bool(L, "random",        mpd_status_get_random(status));
+        lua_table_push_bool(L, "repeat",        mpd_status_get_repeat(status));
+        lua_table_push_bool(L, "single",        mpd_status_get_single(status));
+        lua_table_push_bool(L, "consume",       mpd_status_get_consume(status));
         lua_table_push_int(L, "queue_length",   mpd_status_get_queue_length(status));
         lua_table_push_int(L, "queue_version",  mpd_status_get_queue_version(status));
         lua_table_push_int(L, "crossfade",      mpd_status_get_crossfade(status));
