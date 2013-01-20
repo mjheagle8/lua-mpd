@@ -201,12 +201,37 @@ function test_nowplaying(conn, verbose)
     end
 end
 
-print('playlist:')
-pl = mpd.playlist(conn)
-print(pl)
-if type(pl) == type({}) then
-    for k, v in pairs(pl) do
-        print(string.format('  %s: %s - %s', tostring(k), tostring(v.artist), tostring(v.title)))
+-- test playlist function
+-- compare data gathered against 'mpc playlist' output
+function test_playlist(conn, verbose)
+    print('playlist:')
+    local pl = mpd.playlist(conn)
+    local passed = true
+
+    -- check for valid return type
+    if type(pl) ~= type({}) then
+        passed = false
+    else
+
+    -- get mpc output and iterate through it
+        local cmd = io.popen('mpc playlist --format="%file%"')
+        local counter = 0
+        while true do
+            local line = cmd:read('*l')
+            if line == nil then break end
+            counter = counter + 1
+            if line ~= pl[counter].uri then
+                passed = false
+                break
+            end
+        end
+        cmd:close()
+    end
+
+    if passed == true then
+        print('  passed')
+    else
+        print('  failed')
     end
 end
 
@@ -216,6 +241,7 @@ test_stats(conn, verbose)
 state = test_state(conn, verbose)
 test_volume(conn, verbose)
 test_nowplaying(conn, verbose)
+test_playlist(conn, verbose)
 
 mpd.free_connection(conn)
 print('done')
