@@ -247,6 +247,15 @@ void mpd_parse_song(lua_State *L, struct mpd_song *song)
         lua_table_push_str(L, "performer",      mpd_song_get_tag(song, MPD_TAG_PERFORMER, 0));
         lua_table_push_str(L, "comment",        mpd_song_get_tag(song, MPD_TAG_COMMENT, 0));
         lua_table_push_str(L, "disc",           mpd_song_get_tag(song, MPD_TAG_DISC, 0));
+
+        /* add non-tag fields */
+        lua_table_push_str(L, "uri",            mpd_song_get_uri(song));
+        lua_table_push_int(L, "duration",       mpd_song_get_duration(song));
+        lua_table_push_int(L, "start",          mpd_song_get_start(song));
+        lua_table_push_int(L, "end",            mpd_song_get_end(song));
+        lua_table_push_int(L, "last_modified",  mpd_song_get_last_modified(song));
+        lua_table_push_int(L, "pos",            mpd_song_get_pos(song));
+        lua_table_push_int(L, "id",             mpd_song_get_id(song));
 }
 
 /*
