@@ -107,10 +107,75 @@ function test_volume(conn, verbose)
     end
 end
 
-print('state:')
-state = mpd.state(conn)
-print(state)
-printtable(state)
+-- test state function
+-- compare data gathered against 'mpc status' output
+-- returns state for global use
+function test_state(conn, verbose)
+    print('state:')
+    local state = mpd.state(conn)
+
+    -- gather command output
+    local cmd = io.popen('mpc status')
+    local mpclines = cmd:read('*a')
+    cmd:close()
+    if verbose == true then print(mpclines) end
+
+    -- parse mpc output
+    -- remove first line
+    mpclines = mpclines:sub(2+#(mpclines:match('[^\n]+')))
+    -- match fields in 2nd line
+    local mpcstate, plpos, plsize, songpos, songsize =
+        mpclines:match('%[(%w+)%]%s+#(%d+)/(%d+)%s+([%d:]+)/([%d:]+)')
+    -- remove second line
+    mpclines = mpclines:sub(2+#(mpclines:match('[^\n]+')))
+    -- match fields in 3rd line
+    local vol, rpt, random, single, consume =
+        mpclines:match('volume:(%d+)%%%s+repeat: (%w+)%s+random: (%w+)%s+single: (%w+)%s+consume: (%w+)')
+
+    -- helper function to map on/off to 1/0
+    local str2bool = function (a) if a == 'on' then return 1 else return 0 end end
+
+    -- helper function to map mm:ss to integer
+    local time2int = function (a)
+        local m, s = a:match('(%d+):(%d+)')
+        return 60*m + s
+    end
+
+    -- print fields parsed
+    if verbose == true then
+        print(string.format('  %s', mpcstate))
+        print(string.format('  %s', plpos))
+        print(string.format('  %s', plsize))
+        print(string.format('  %s (%d)', songpos, time2int(songpos)))
+        print(string.format('  %s (%d)', songsize, time2int(songsize)))
+        print(string.format('  %s', vol))
+        print(string.format('  %s (%d)', rpt, str2bool(rpt)))
+        print(string.format('  %s (%d)', random, str2bool(random)))
+        print(string.format('  %s (%d)', single, str2bool(single)))
+        print(string.format('  %s (%d)', consume, str2bool(consume)))
+    end
+
+    -- check parsed fields
+    local passed =
+        state.state == mpcstate and
+        state.song_id+1 == tonumber(plpos) and
+        state.queue_length == tonumber(plsize) and
+        state.elapsed_time == time2int(songpos) and
+        state.total_time == time2int(songsize) and
+        state.volume == tonumber(vol) and
+        state['repeat'] == str2bool(rpt) and
+        state.random == str2bool(random) and
+        state.single == str2bool(single) and
+        state.consume == str2bool(consume)
+
+    if passed == true then
+        print('  passed')
+    else
+        print('  failed')
+    end
+
+    return state
+end
 
 print('now playing:')
 np = mpd.now_playing(conn)
@@ -129,6 +194,7 @@ end
 -- run test functions
 local verbose = false
 test_stats(conn, verbose)
+state = test_state(conn, verbose)
 test_volume(conn, verbose)
 
 mpd.free_connection(conn)
