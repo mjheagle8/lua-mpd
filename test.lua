@@ -177,10 +177,29 @@ function test_state(conn, verbose)
     return state
 end
 
-print('now playing:')
-np = mpd.now_playing(conn)
-print(np)
-printtable(np)
+-- test now playing function
+-- compare data gathered against formatted 'mpc status' output
+function test_nowplaying(conn, verbose)
+    print('now playing:')
+    local np = mpd.now_playing(conn)
+
+    -- get mpc output
+    local cmd = io.popen("mpc status --format='%title%::%album%::%artist%::%track%::%genre%::%date%'")
+    local mpc = cmd:read('*l')
+    cmd:close()
+    if verbose == true then print(mpc) end
+
+    -- format now playing to match mpc output
+    local npstr = string.format('%s::%s::%s::%s::%s::%s', np.title, np.album, np.artist, np.track, np.genre, np.date)
+    if verbose == true then print(npstr) end
+
+    -- check for matching output
+    if npstr == mpc then
+        print('  passed')
+    else
+        print('  failed')
+    end
+end
 
 print('playlist:')
 pl = mpd.playlist(conn)
@@ -196,6 +215,7 @@ local verbose = false
 test_stats(conn, verbose)
 state = test_state(conn, verbose)
 test_volume(conn, verbose)
+test_nowplaying(conn, verbose)
 
 mpd.free_connection(conn)
 print('done')
