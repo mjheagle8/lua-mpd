@@ -290,22 +290,18 @@ int mpd_now_playing(lua_State *L)
 }
 
 /*
- * get current playlist
- * lua function
- * argument is connection
- * return is a table of mpd tags
+ * receive a list of songs from mpd
+ * internal function
+ * arguments are lua_State and mpd connection
+ * will push table of song results to lua
+ * return is number of songs received
  */
-int mpd_cur_playlist(lua_State *L)
+int mpd_recv_song_list(lua_State *L, struct mpd_connection *conn)
 {
-        get_mpd_conn(L);
-
-        /* create table for playlist */
+        /* create table for results */
         lua_newtable(L);
 
-        /* initiate playlist transmission */
-        mpd_send_list_queue_meta(conn);
-
-        /* loop through songs */
+        /* iterate through songs and add them to table */
         int counter = 0;
         struct mpd_song *song = NULL;
         while ((song = mpd_recv_song(conn)) != NULL)
@@ -316,6 +312,25 @@ int mpd_cur_playlist(lua_State *L)
                 lua_settable(L, -3);
                 mpd_song_free(song);
         }
+
+        return counter;
+}
+
+/*
+ * get current playlist
+ * lua function
+ * argument is connection
+ * return is a table of mpd tags
+ */
+int mpd_cur_playlist(lua_State *L)
+{
+        get_mpd_conn(L);
+
+        /* initiate playlist transmission */
+        mpd_send_list_queue_meta(conn);
+
+        /* receive songs */
+        mpd_recv_song_list(L, conn);
 
         return 1;
 }

@@ -14,7 +14,7 @@ lua bindings to libmpdclient, by mjheagle
 * controls
     * next
     * play
-    * prev
+    * previous
     * stop
     * toggle
 - enable/disable sound outputs
@@ -37,6 +37,6 @@ lua bindings to libmpdclient, by mjheagle
     * toggle repeat
     * toggle single
     * modify volume
-    * use bools where possible
+    * use booleans where possible
 * stats
 - update database
