@@ -153,6 +153,7 @@ function test_state(conn, verbose)
         print(string.format('  %s (%s)', random, str2bool(random)))
         print(string.format('  %s (%s)', single, str2bool(single)))
         print(string.format('  %s (%s)', consume, str2bool(consume)))
+        printtable(state)
     end
 
     -- check parsed fields
@@ -225,6 +226,10 @@ function test_playlist(conn, verbose)
             counter = counter + 1
             if line ~= pl[counter].uri then
                 passed = false
+                if verbose then
+                    print(line)
+                    print(pl[counter].uri)
+                end
                 break
             end
         end
