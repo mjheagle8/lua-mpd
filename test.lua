@@ -191,6 +191,7 @@ function test_nowplaying(conn, verbose)
     for i = 1,5 do
         mpc = mpc:gsub('::::', '::nil::')
     end
+    mpc = mpc:gsub('::$', '::nil')
     if verbose == true then print(mpc) end
 
     -- format now playing to match mpc output
