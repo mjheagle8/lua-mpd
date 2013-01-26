@@ -11,9 +11,8 @@ lua bindings to libmpdclient, by mjheagle
     * connect
     * free
     - passwords
-- controls
+* controls
     * next
-    - pause
     * play
     * prev
     * stop
