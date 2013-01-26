@@ -37,6 +37,15 @@ local function reltime(t)
     return string.format('%d days, %d:%02d:%02d', days, hours, min, sec)
 end
 
+-- helper function to print success or failure
+local function printpassfail(pass)
+    if pass then
+        print('  passed')
+    else
+        print('  failed')
+    end
+end
+
 -- connect to mpd
 print('attempting mpd connection...')
 conn = mpd.connect('localhost', 6600, 1000)
@@ -72,11 +81,7 @@ DB Play Time: %s
     stats.artists, stats.albums, stats.songs, reltime(stats.play_time), reltime(stats.uptime), stats.db_update_time, reltime(stats.db_play_time))
     if verbose == true then print(liblines) end
 
-    if liblines == mpclines then
-        print('  passed')
-    else
-        print('  failed')
-    end
+    printpassfail(liblines == mpclines)
 end
 
 -- test volume function
@@ -100,11 +105,7 @@ function test_volume(conn, verbose)
     if verbose == true then print(string.format('  volume: %d%%', state.volume)) end
     if state.volume ~= v0 then pass = false end
 
-    if pass then
-        print('  passed')
-    else
-        print('  failed')
-    end
+    printpassfail(pass)
 end
 
 -- test state function
@@ -169,11 +170,7 @@ function test_state(conn, verbose)
         state.single == str2bool(single) and
         state.consume == str2bool(consume)
 
-    if passed == true then
-        print('  passed')
-    else
-        print('  failed')
-    end
+    printpassfail(passed == true)
 
     return state
 end
@@ -199,11 +196,7 @@ function test_nowplaying(conn, verbose)
     if verbose == true then print(npstr) end
 
     -- check for matching output
-    if npstr == mpc then
-        print('  passed')
-    else
-        print('  failed')
-    end
+    printpassfail(npstr == mpc)
 end
 
 -- test playlist function
@@ -237,11 +230,7 @@ function test_playlist(conn, verbose)
         cmd:close()
     end
 
-    if passed == true then
-        print('  passed')
-    else
-        print('  failed')
-    end
+    printpassfail(passed == true)
 end
 
 -- test toggle a state element
@@ -265,11 +254,7 @@ end
 function test_random(conn, verbose)
     print('random:')
     local pass = test_togglestate('random', mpd.random)
-    if pass then
-        print('  passed')
-    else
-        print('  failed')
-    end
+    printpassfail(pass)
 end
 
 -- run test functions
