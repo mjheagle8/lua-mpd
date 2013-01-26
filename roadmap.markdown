@@ -29,7 +29,7 @@ lua bindings to libmpdclient, by mjheagle
     - remove from playlist
     - remove playlist
     - save playlist
-- search
+* search
 * state
     * get current state
     * toggle consume
