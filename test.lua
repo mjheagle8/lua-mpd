@@ -235,6 +235,7 @@ end
 
 -- test toggle a state element
 -- arguments are key of state variable that is being changed, and function to set it
+-- requires state
 -- return whether toggle was successful
 function test_togglestate(key, func)
     local istate = state[key]
@@ -279,12 +280,19 @@ function test_single(conn, verbose)
 end
 
 -- test search
+-- requires now_playing
 function test_search(conn, verbose)
     print('search:')
-    local pl = mpd.search(conn, false)
+    local np = mpd.now_playing(conn)
+    local pl = mpd.search(conn, false, 'artist', np.artist, 'title', np.title)
+    local pass = true
     for k, v in ipairs(pl) do
-        print(string.format('%3d: %s', k, v.uri))
+        if verbose then print(string.format('%3d: %s', k, v.uri)) end
+        if v.artist ~= np.artist or v.title ~= np.title then
+            pass = false
+        end
     end
+    printpassfail(pass)
 end
 
 -- run test functions
