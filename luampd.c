@@ -336,6 +336,45 @@ int mpd_cur_playlist(lua_State *L)
 }
 
 /*
+ * run a search
+ * lua function
+ * arguments are connection, boolean for exact search, then pairs of search type/key arguments
+ */
+int mpd_search(lua_State *L)
+{
+        get_mpd_conn(L);
+
+        /* determine if search is exact */
+        bool exact = false;
+        if (!lua_isboolean(L, 2))
+        {
+                lua_pushstring(L, "invalid arguments.  boolean for exact search must be second");
+                return 1;
+        }
+        exact = lua_toboolean(L, 2);
+        mpd_search_db_songs(conn, exact);
+
+        /* add search constraints */
+        int c;
+        const int nargs = lua_gettop(L);
+        for (c = 3; c <= nargs; c++)
+        {
+                if (!lua_isstring(L, c))
+                        break;
+                printf("arg %3d: %s\n", c, lua_tostring(L, c)); /* debug */
+                mpd_search_add_any_tag_constraint(conn, MPD_OPERATOR_DEFAULT, lua_tostring(L, c));
+        }
+
+        /* run search */
+        mpd_search_commit(conn);
+
+        /* receive songs */
+        mpd_recv_song_list(L, conn);
+
+        return 1;
+}
+
+/*
  * get mpd statistics
  * lua function
  * argument is connection
@@ -473,6 +512,7 @@ static const struct luaL_Reg mpd[] =
         {"prev",                mpd_prev},
         {"random",              mpd_random},
         {"repeat",              mpd_repeat},
+        {"search",              mpd_search},
         {"set_volume",          mpd_volume},
         {"single",              mpd_single},
         {"state",               mpd_state},

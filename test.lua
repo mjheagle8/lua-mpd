@@ -278,6 +278,15 @@ function test_single(conn, verbose)
     printpassfail(pass)
 end
 
+-- test search
+function test_search(conn, verbose)
+    print('search:')
+    local pl = mpd.search(conn, false)
+    for k, v in ipairs(pl) do
+        print(string.format('%3d: %s', k, v.uri))
+    end
+end
+
 -- run test functions
 local verbose = false
 test_stats(conn, verbose)
@@ -289,6 +298,7 @@ test_random(conn, verbose)
 test_consume(conn, verbose)
 test_repeat(conn, verbose)
 test_single(conn, verbose)
+test_search(conn, verbose)
 
 mpd.free_connection(conn)
 print('done')
