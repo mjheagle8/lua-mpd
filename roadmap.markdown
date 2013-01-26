@@ -31,12 +31,12 @@ lua bindings to libmpdclient, by mjheagle
     - remove playlist
     - save playlist
 - search
-- state
+* state
     * get current state
-    - toggle consume
-    - toggle random
-    - toggle repeat
-    - toggle single
+    * toggle consume
+    * toggle random
+    * toggle repeat
+    * toggle single
     * modify volume
     * use bools where possible
 * stats

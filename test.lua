@@ -257,6 +257,27 @@ function test_random(conn, verbose)
     printpassfail(pass)
 end
 
+-- test toggle consume
+function test_consume(conn, verbose)
+    print('consume:')
+    local pass = test_togglestate('consume', mpd.consume)
+    printpassfail(pass)
+end
+
+-- test toggle repeat
+function test_repeat(conn, verbose)
+    print('repeat:')
+    local pass = test_togglestate('repeat', mpd['repeat'])
+    printpassfail(pass)
+end
+
+-- test toggle single
+function test_single(conn, verbose)
+    print('single:')
+    local pass = test_togglestate('single', mpd.single)
+    printpassfail(pass)
+end
+
 -- run test functions
 local verbose = false
 test_stats(conn, verbose)
@@ -265,6 +286,9 @@ test_volume(conn, verbose)
 test_nowplaying(conn, verbose)
 test_playlist(conn, verbose)
 test_random(conn, verbose)
+test_consume(conn, verbose)
+test_repeat(conn, verbose)
+test_single(conn, verbose)
 
 mpd.free_connection(conn)
 print('done')

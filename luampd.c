@@ -412,10 +412,44 @@ int mpd_random(lua_State *L)
         return mpd_set_bool(L, &mpd_run_random);
 }
 
+/*
+ * set mpd consume state
+ * lua function
+ * arguments are connection, boolean random state to set
+ * no returns
+ */
+int mpd_consume(lua_State *L)
+{
+        return mpd_set_bool(L, &mpd_run_consume);
+}
+
+/*
+ * set mpd repeat state
+ * lua function
+ * arguments are connection, boolean random state to set
+ * no returns
+ */
+int mpd_repeat(lua_State *L)
+{
+        return mpd_set_bool(L, &mpd_run_repeat);
+}
+
+/*
+ * set mpd single state
+ * lua function
+ * arguments are connection, boolean random state to set
+ * no returns
+ */
+int mpd_single(lua_State *L)
+{
+        return mpd_set_bool(L, &mpd_run_single);
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
         {"connect",             mpd_connect},
+        {"consume",             mpd_consume},
         {"free_connection",     mpd_free_connection},
         {"next",                mpd_next},
         {"now_playing",         mpd_now_playing},
@@ -423,7 +457,9 @@ static const struct luaL_Reg mpd[] =
         {"playlist",            mpd_cur_playlist},
         {"prev",                mpd_prev},
         {"random",              mpd_random},
+        {"repeat",              mpd_repeat},
         {"set_volume",          mpd_volume},
+        {"single",              mpd_single},
         {"state",               mpd_state},
         {"stats",               mpd_stats},
         {"stop",                mpd_stop},
