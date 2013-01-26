@@ -52,7 +52,7 @@ int mpd_connect(lua_State *L)
         const int timeout = lua_tonumber(L, 3);
 
         /* establish connection */
-        struct mpd_conection *conn = mpd_connection_new(host, port, timeout);
+        struct mpd_connection *conn = mpd_connection_new(host, port, timeout);
         enum mpd_error err = mpd_connection_get_error((const struct mpd_connection *)conn);
         if (err != MPD_ERROR_SUCCESS)
         {
