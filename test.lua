@@ -244,6 +244,34 @@ function test_playlist(conn, verbose)
     end
 end
 
+-- test toggle a state element
+-- arguments are key of state variable that is being changed, and function to set it
+-- return whether toggle was successful
+function test_togglestate(key, func)
+    local istate = state[key]
+
+    func(conn, not istate)
+    local s0 = mpd.state(conn)
+    if istate == s0[key] then return false end
+
+    func(conn, istate)
+    local s1 = mpd.state(conn)
+    if istate ~= s1[key] then return false end
+
+    return true
+end
+
+-- test toggle random
+function test_random(conn, verbose)
+    print('random:')
+    local pass = test_togglestate('random', mpd.random)
+    if pass then
+        print('  passed')
+    else
+        print('  failed')
+    end
+end
+
 -- run test functions
 local verbose = false
 test_stats(conn, verbose)
@@ -251,6 +279,7 @@ state = test_state(conn, verbose)
 test_volume(conn, verbose)
 test_nowplaying(conn, verbose)
 test_playlist(conn, verbose)
+test_random(conn, verbose)
 
 mpd.free_connection(conn)
 print('done')

@@ -380,6 +380,38 @@ int mpd_volume(lua_State *L)
         return 0;
 }
 
+/*
+ * set a boolean
+ * internal function
+ * arguments are lua_State and function to set boolean
+ * will parse boolean mode to set from lua_State
+ * return status of command run
+ */
+int mpd_set_bool(lua_State *L, bool (*func)(struct mpd_connection *, bool))
+{
+        get_mpd_conn(L);
+
+        /* get state from arguments */
+        bool mode;
+        if (lua_isboolean(L, 2) == 1)
+                mode = lua_toboolean(L, 2);
+        else
+                return 0;
+
+        return func(conn, mode);
+}
+
+/*
+ * set mpd random state
+ * lua function
+ * arguments are connection, boolean random state to set
+ * no returns
+ */
+int mpd_random(lua_State *L)
+{
+        return mpd_set_bool(L, &mpd_run_random);
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
@@ -390,6 +422,7 @@ static const struct luaL_Reg mpd[] =
         {"play",                mpd_play},
         {"playlist",            mpd_cur_playlist},
         {"prev",                mpd_prev},
+        {"random",              mpd_random},
         {"set_volume",          mpd_volume},
         {"state",               mpd_state},
         {"stats",               mpd_stats},
