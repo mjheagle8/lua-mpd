@@ -357,12 +357,30 @@ int mpd_search(lua_State *L)
         /* add search constraints */
         int c;
         const int nargs = lua_gettop(L);
-        for (c = 3; c <= nargs; c++)
+        for (c = 4; c <= nargs; c+=2)
         {
-                if (!lua_isstring(L, c))
+                if (!lua_isstring(L, c) || !lua_isstring(L, c-1))
                         break;
-                printf("arg %3d: %s\n", c, lua_tostring(L, c)); /* debug */
-                mpd_search_add_any_tag_constraint(conn, MPD_OPERATOR_DEFAULT, lua_tostring(L, c));
+                const char *type = lua_tostring(L, c-1);
+                const char *value = lua_tostring(L, c);
+                if (strcasecmp(type, "any") == 0)
+                        mpd_search_add_any_tag_constraint(conn, MPD_OPERATOR_DEFAULT, value);
+                else
+                {
+                        enum mpd_tag_type mode = MPD_TAG_COUNT;
+                        int i;
+                        for (i = 0; i < MPD_TAG_COUNT; i++)
+                        {
+                                const char *tag = mpd_tag_name(i);
+                                if (strcasecmp(type, tag) == 0)
+                                {
+                                        mode = i;
+                                        break;
+                                }
+                        }
+                        if (mode != MPD_TAG_COUNT)
+                                mpd_search_add_tag_constraint(conn, MPD_OPERATOR_DEFAULT, mode, value);
+                }
         }
 
         /* run search */
