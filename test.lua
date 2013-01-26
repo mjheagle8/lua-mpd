@@ -187,6 +187,9 @@ function test_nowplaying(conn, verbose)
     local cmd = io.popen("mpc status --format='%title%::%album%::%artist%::%track%::%genre%::%date%'")
     local mpc = cmd:read('*l')
     cmd:close()
+    for i = 1,5 do
+        mpc = mpc:gsub('::::', '::nil::')
+    end
     if verbose == true then print(mpc) end
 
     -- format now playing to match mpc output
