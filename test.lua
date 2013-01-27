@@ -312,6 +312,32 @@ function test_version(conn, verbose)
     printpassfail(mpc == ver)
 end
 
+-- test playlists
+-- compares output with mpc
+function test_playlists(conn, verbose)
+    print('playlists:')
+    local pls = mpd.playlists(conn)
+    local cmd = io.popen('mpc lsplaylists')
+    local counter = 0
+    local pass = true
+    while true do
+        local line = cmd:read('*l')
+        if line == nil then break end
+        counter = counter + 1
+        if verbose then
+            print('  ' .. line)
+            print('  ' .. pls[counter])
+        end
+        if line ~= pls[counter] then
+            pass = false
+            break
+        end
+    end
+    cmd:close()
+
+    printpassfail(pass)
+end
+
 -- run test functions
 local verbose = false
 test_stats(conn, verbose)
@@ -325,6 +351,7 @@ test_repeat(conn, verbose)
 test_single(conn, verbose)
 test_search(conn, verbose)
 test_version(conn, verbose)
+test_playlists(conn, verbose)
 
 mpd.free_connection(conn)
 print('done')

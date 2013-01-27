@@ -340,6 +340,41 @@ int mpd_cur_playlist(lua_State *L)
 }
 
 /*
+ * get list of playlists
+ * lua function
+ * argument is connection
+ * return is a table of playlists
+ */
+int mpd_playlists(lua_State *L)
+{
+        get_mpd_conn(L);
+
+        /* initiate transmission */
+        mpd_send_list_meta(conn, "");
+
+        /* create table for results */
+        lua_newtable(L);
+
+        /* receive list */
+        int counter = 0;
+        struct mpd_entity *entity;
+        while ((entity = mpd_recv_entity(conn)) != NULL)
+        {
+                if (mpd_entity_get_type(entity) == MPD_ENTITY_TYPE_PLAYLIST)
+                {
+                        counter++;
+                        const struct mpd_playlist *pl = mpd_entity_get_playlist(entity);
+                        lua_pushinteger(L, counter);
+                        lua_pushstring(L, mpd_playlist_get_path(pl));
+                        lua_settable(L, -3);
+                }
+                mpd_entity_free(entity);
+        }
+
+        return 1;
+}
+
+/*
  * run a search
  * lua function
  * arguments are connection, boolean for exact search, then pairs of search type/key arguments
@@ -553,6 +588,7 @@ static const struct luaL_Reg mpd[] =
         {"now_playing",         mpd_now_playing},
         {"play",                mpd_play},
         {"playlist",            mpd_cur_playlist},
+        {"playlists",           mpd_playlists},
         {"prev",                mpd_prev},
         {"random",              mpd_random},
         {"repeat",              mpd_repeat},
