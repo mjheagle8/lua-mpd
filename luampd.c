@@ -321,7 +321,7 @@ int mpd_recv_song_list(lua_State *L, struct mpd_connection *conn)
 }
 
 /*
- * get current playlist
+ * get queue
  * lua function
  * argument is connection
  * return is a table of mpd tags
@@ -578,12 +578,34 @@ int mpd_version(lua_State *L)
         return 1;
 }
 
+/*
+ * move song in mpd queue
+ * lua function
+ * arguments are connection, from position, to position
+ * positions are zero based
+ * returns success of function
+ */
+int mpd_move(lua_State *L)
+{
+        get_mpd_conn(L);
+
+        if (!(lua_isnumber(L, 2) && lua_isnumber(L, 3)))
+                return 0;
+        const int from = lua_tointeger(L, 2);
+        const int to = lua_tointeger(L, 3);
+
+        lua_pushboolean(L, mpd_run_move(conn, from, to));
+
+        return 1;
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
         {"connect",             mpd_connect},
         {"consume",             mpd_consume},
         {"free_connection",     mpd_free_connection},
+        {"move",                mpd_move},
         {"next",                mpd_next},
         {"now_playing",         mpd_now_playing},
         {"play",                mpd_play},
