@@ -521,6 +521,28 @@ int mpd_single(lua_State *L)
         return mpd_set_bool(L, &mpd_run_single);
 }
 
+/*
+ * get mpd version
+ * lua function
+ * argument is connection
+ * return is version string
+ */
+int mpd_version(lua_State *L)
+{
+        get_mpd_conn(L);
+
+        const unsigned * version = mpd_connection_get_server_version(conn);
+        if (version == NULL)
+                return 0;
+
+        char *vstr = calloc(16, sizeof(char));
+        snprintf(vstr, 16, "%d.%d.%d", version[0], version[1], version[2]);
+        lua_pushstring(L, vstr);
+        free(vstr);
+
+        return 1;
+}
+
 /* index of functions */
 static const struct luaL_Reg mpd[] =
 {
@@ -541,6 +563,7 @@ static const struct luaL_Reg mpd[] =
         {"stats",               mpd_stats},
         {"stop",                mpd_stop},
         {"toggle",              mpd_toggle},
+        {"version",             mpd_version},
         {NULL,                  NULL}
 };
 

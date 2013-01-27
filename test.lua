@@ -296,6 +296,22 @@ function test_search(conn, verbose)
     printpassfail(pass)
 end
 
+-- test version
+-- compares output with mpc
+function test_version(conn, verbose)
+    print('version:')
+    local cmd = io.popen('mpc version')
+    local mpc = cmd:read('*a')
+    mpc = mpc:sub(1, #mpc-1)
+    cmd:close()
+    if verbose then print('  ' .. mpc) end
+
+    local ver = 'mpd version: ' .. mpd.version(conn)
+    if verbose then print('  ' .. tostring(ver)) end
+
+    printpassfail(mpc == ver)
+end
+
 -- run test functions
 local verbose = false
 test_stats(conn, verbose)
@@ -308,6 +324,7 @@ test_consume(conn, verbose)
 test_repeat(conn, verbose)
 test_single(conn, verbose)
 test_search(conn, verbose)
+test_version(conn, verbose)
 
 mpd.free_connection(conn)
 print('done')

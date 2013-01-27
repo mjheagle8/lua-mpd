@@ -18,7 +18,7 @@ lua bindings to libmpdclient, by mjheagle
     * stop
     * toggle
 - enable/disable sound outputs
-- get mpd version
+* get mpd version
 - playlist
     - add to playlist
     - clear playlist
