@@ -317,7 +317,7 @@ int mpd_recv_song_list(lua_State *L, struct mpd_connection *conn)
  * get queue
  * lua function
  * argument is connection
- * return is a table of mpd tags
+ * return is a table of songs, where each song is a table of tags
  */
 int mpd_cur_playlist(lua_State *L)
 {
@@ -371,6 +371,7 @@ int mpd_playlists(lua_State *L)
  * run a search
  * lua function
  * arguments are connection, boolean for exact search, then pairs of search type/key arguments
+ * return is a table of songs, where each song is a table of tags
  */
 int mpd_search(lua_State *L)
 {
