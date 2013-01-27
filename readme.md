@@ -180,4 +180,4 @@ Roadmap
 * stats
 - update database
 
-# vim: ft=markdown ts=2 sw=2
+<!-- vim: set ft=markdown ts=2 sw=2: -->
