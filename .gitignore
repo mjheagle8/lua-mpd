@@ -1,2 +1,4 @@
 *.so
 tags
+*.pkg.tar.xz
+pkg/*
