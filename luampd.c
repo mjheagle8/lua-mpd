@@ -79,8 +79,7 @@ errorout:
  * run a mpd command
  * internal function
  * arguments are lua_state and the function to execute
- * will push error message onto stack if necessary
- * and return the integer to be returned to lua
+ * will push the success of the function onto the stack
  */
 int mpd_cmd(lua_State *L, bool (*func)())
 {
@@ -88,15 +87,9 @@ int mpd_cmd(lua_State *L, bool (*func)())
 
         /* run command */
         bool ret = (int)func(conn);
+        lua_pushboolean(L, ret);
 
-        /* determine whether to print error message in lua */
-        if (ret)
-                return 0;
-        else
-        {
-                lua_pushstring(L, "error running mpd command");
-                return 1;
-        }
+        return 1;
 }
 
 /*
@@ -471,7 +464,7 @@ int mpd_stats(lua_State *L)
  * set mpd volume
  * lua function
  * arguments are connection, volume to set (0-100)
- * no returns
+ * return is success of function
  */
 int mpd_volume(lua_State *L)
 {
@@ -487,8 +480,9 @@ int mpd_volume(lua_State *L)
                 return 0;
 
         /* set volume */
-        mpd_run_set_volume(conn, vol);
-        return 0;
+        lua_pushboolean(L, mpd_run_set_volume(conn, vol));
+
+        return 1;
 }
 
 /*
@@ -516,7 +510,7 @@ int mpd_set_bool(lua_State *L, bool (*func)(struct mpd_connection *, bool))
  * set mpd random state
  * lua function
  * arguments are connection, boolean random state to set
- * no returns
+ * return is success of function
  */
 int mpd_random(lua_State *L)
 {
@@ -527,7 +521,7 @@ int mpd_random(lua_State *L)
  * set mpd consume state
  * lua function
  * arguments are connection, boolean random state to set
- * no returns
+ * return is success of function
  */
 int mpd_consume(lua_State *L)
 {
@@ -538,7 +532,7 @@ int mpd_consume(lua_State *L)
  * set mpd repeat state
  * lua function
  * arguments are connection, boolean random state to set
- * no returns
+ * return is success of function
  */
 int mpd_repeat(lua_State *L)
 {
@@ -549,7 +543,7 @@ int mpd_repeat(lua_State *L)
  * set mpd single state
  * lua function
  * arguments are connection, boolean random state to set
- * no returns
+ * return is success of function
  */
 int mpd_single(lua_State *L)
 {
