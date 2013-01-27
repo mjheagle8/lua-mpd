@@ -10,6 +10,10 @@
 #include <string.h>
 #include <mpd/client.h>
 
+#if LUA_VERSION_NUM < 502
+#  define luaL_newlib(L,l) (lua_newtable(L), luaL_register(L,NULL,l))
+#endif
+
 /*
  * macros
  */
@@ -544,6 +548,7 @@ static const struct luaL_Reg mpd[] =
 int luaopen_mpd (lua_State *L)
 {
         luaL_newlib(L, mpd);
+        lua_pushvalue(L, -1);
         lua_setglobal(L, "mpd");
         return 1;
 }

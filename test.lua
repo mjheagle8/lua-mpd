@@ -192,7 +192,8 @@ function test_nowplaying(conn, verbose)
     if verbose == true then print(mpc) end
 
     -- format now playing to match mpc output
-    local npstr = string.format('%s::%s::%s::%s::%s::%s', np.title, np.album, np.artist, np.track, np.genre, np.date)
+    local npstr = string.format('%s::%s::%s::%s::%s::%s',
+        tostring(np.title), tostring(np.album), tostring(np.artist), tostring(np.track), tostring(np.genre), tostring(np.date))
     if verbose == true then print(npstr) end
 
     -- check for matching output
