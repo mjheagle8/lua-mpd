@@ -23,7 +23,7 @@ lua bindings to libmpdclient, by mjheagle
     - add to playlist
     - clear playlist
     * get playlist
-    - list playlists
+    * list playlists
     - load playlist
     - move song in playlist
     - remove from playlist
