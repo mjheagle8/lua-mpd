@@ -125,7 +125,7 @@ function test_state(conn, verbose)
     -- remove first line
     mpclines = mpclines:sub(2+#(mpclines:match('[^\n]+')))
     -- match fields in 2nd line
-    local mpcstate, plpos, plsize, songpos, songsize =
+    local mpcstate, plpos, plsize, elapsed, songsize =
         mpclines:match('%[(%w+)%]%s+#(%d+)/(%d+)%s+([%d:]+)/([%d:]+)')
     -- remove second line
     mpclines = mpclines:sub(2+#(mpclines:match('[^\n]+')))
@@ -144,25 +144,27 @@ function test_state(conn, verbose)
 
     -- print fields parsed
     if verbose == true then
-        print(string.format('  %s', mpcstate))
-        print(string.format('  %s', plpos))
-        print(string.format('  %s', plsize))
-        print(string.format('  %s (%d)', songpos, time2int(songpos)))
-        print(string.format('  %s (%d)', songsize, time2int(songsize)))
-        print(string.format('  %s', vol))
-        print(string.format('  %s (%s)', rpt, str2bool(rpt)))
-        print(string.format('  %s (%s)', random, str2bool(random)))
-        print(string.format('  %s (%s)', single, str2bool(single)))
-        print(string.format('  %s (%s)', consume, str2bool(consume)))
+        print('  ==parsed==')
+        print(string.format('  state: %s', mpcstate))
+        print(string.format('  song_pos: %s', plpos))
+        print(string.format('  queue_length: %s', plsize))
+        print(string.format('  elapsed_time: %s (%d)', elapsed, time2int(elapsed)))
+        print(string.format('  total_time: %s (%d)', songsize, time2int(songsize)))
+        print(string.format('  volume: %s', vol))
+        print(string.format('  repeat: %s (%s)', rpt, str2bool(rpt)))
+        print(string.format('  random: %s (%s)', random, str2bool(random)))
+        print(string.format('  single: %s (%s)', single, str2bool(single)))
+        print(string.format('  consume: %s (%s)', consume, str2bool(consume)))
+        print('  ==lib==')
         printtable(state)
     end
 
     -- check parsed fields
     local passed =
         state.state == mpcstate and
-        state.song_id+1 == tonumber(plpos) and
+        state.song_pos+1 == tonumber(plpos) and
         state.queue_length == tonumber(plsize) and
-        state.elapsed_time == time2int(songpos) and
+        state.elapsed_time == time2int(elapsed) and
         state.total_time == time2int(songsize) and
         state.volume == tonumber(vol) and
         state['repeat'] == str2bool(rpt) and
