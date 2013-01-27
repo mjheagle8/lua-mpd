@@ -10,5 +10,13 @@ mpd.so: luampd.c
 l51mpd.so: luampd.c
 	$(CC) $(CFLAGS) -llua5.1 luampd.c -o l51mpd.so -I/usr/include/lua5.1
 
+install: all
+	install -D -m644 mpd.so $(DESTDIR)$(PREFIX)/usr/lib/lua/5.2/mpd.so
+	install -D -m644 l51mpd.so $(DESTDIR)$(PREFIX)/usr/lib/lua/5.1/mpd.so
+
+uninstall:
+	$(RM) $(DESTDIR)$(PREFIX)/usr/lib/lua/5.2/mpd.so
+	$(RM) $(DESTDIR)$(PREFIX)/usr/lib/lua/5.1/mpd.so
+
 clean:
-	rm *.so
+	$(RM) *.so
