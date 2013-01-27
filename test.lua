@@ -40,9 +40,9 @@ end
 -- helper function to print success or failure
 local function printpassfail(pass)
     if pass then
-        print('  passed')
+        print(string.format('  %s%s%s', '\27[32m', 'passed', '\27[0m'))
     else
-        print('  failed')
+        print(string.format('  %s%s%s', '\27[31m', 'failed', '\27[0m'))
     end
 end
 
