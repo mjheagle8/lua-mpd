@@ -368,29 +368,17 @@ int mpd_playlists(lua_State *L)
 }
 
 /*
- * run a search
- * lua function
- * arguments are connection, boolean for exact search, then pairs of search type/key arguments
- * return is a table of songs, where each song is a table of tags
+ * add constraints to a mpd search
+ * internal function
+ * arguments are lua_State, stack position to start at, and mpd connection
+ * no return
  */
-int mpd_search(lua_State *L)
+void mpd_search_add_constraints(lua_State *L, const int start, struct mpd_connection *conn)
 {
-        get_mpd_conn(L);
-
-        /* determine if search is exact */
-        bool exact = false;
-        if (!lua_isboolean(L, 2))
-        {
-                lua_pushstring(L, "invalid arguments.  boolean for exact search must be second");
-                return 1;
-        }
-        exact = lua_toboolean(L, 2);
-        mpd_search_db_songs(conn, exact);
-
-        /* add search constraints */
         int c;
         const int nargs = lua_gettop(L);
-        for (c = 4; c <= nargs; c+=2)
+
+        for (c = start; c <= nargs; c+=2)
         {
                 if (!lua_isstring(L, c) || !lua_isstring(L, c-1))
                         break;
@@ -415,6 +403,30 @@ int mpd_search(lua_State *L)
                                 mpd_search_add_tag_constraint(conn, MPD_OPERATOR_DEFAULT, mode, value);
                 }
         }
+}
+
+/*
+ * run a search
+ * lua function
+ * arguments are connection, boolean for exact search, then pairs of search type/key arguments
+ * return is a table of songs, where each song is a table of tags
+ */
+int mpd_search(lua_State *L)
+{
+        get_mpd_conn(L);
+
+        /* determine if search is exact */
+        bool exact = false;
+        if (!lua_isboolean(L, 2))
+        {
+                lua_pushstring(L, "invalid arguments.  boolean for exact search must be second");
+                return 1;
+        }
+        exact = lua_toboolean(L, 2);
+        mpd_search_db_songs(conn, exact);
+
+        /* add constraints */
+        mpd_search_add_constraints(L, 4, conn);
 
         /* run search */
         mpd_search_commit(conn);

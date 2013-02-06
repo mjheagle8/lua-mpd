@@ -164,7 +164,7 @@ Roadmap
   * get playlist
   * list playlists
   - load playlist
-  - move song in playlist
+  * move song in playlist
   - remove from playlist
   - remove playlist
   - save playlist
