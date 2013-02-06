@@ -438,6 +438,33 @@ int mpd_search(lua_State *L)
 }
 
 /*
+ * run a search and count the results
+ * lua function
+ * arguments are connection, then pairs of search type/key arguments
+ * return is an integer indicating the number of songs matching search
+ */
+int mpd_search_count(lua_State *L)
+{
+        get_mpd_conn(L);
+
+        /* initialize search */
+        mpd_count_db_songs(conn);
+
+        /* add constraints */
+        mpd_search_add_constraints(L, 3, conn);
+
+        /* run search */
+        mpd_search_commit(conn);
+
+        /* receive response */
+        struct mpd_stats *stats = mpd_recv_stats(conn);
+        lua_pushinteger(L, mpd_stats_get_number_of_songs(stats));
+        mpd_stats_free(stats);
+
+        return 1;
+}
+
+/*
  * get mpd statistics
  * lua function
  * argument is connection
@@ -622,6 +649,7 @@ static const struct luaL_Reg mpd[] =
         {"random",              mpd_random},
         {"repeat",              mpd_repeat},
         {"search",              mpd_search},
+        {"search_count",        mpd_search_count},
         {"set_volume",          mpd_volume},
         {"single",              mpd_single},
         {"state",               mpd_state},
